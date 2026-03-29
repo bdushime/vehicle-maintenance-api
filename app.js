@@ -4,16 +4,16 @@ const logStore = require('./logStore');
 const app = express();
 app.use(express.json());
 
+// US-001: View All Logs
 app.get('/logs', (req, res) => {
   const logs = logStore.getAllLogs();
   res.status(200).json(logs);
 });
 
-
+// US-002: Create a New Log
 app.post('/logs', (req, res) => {
   const { vehicle, serviceType, description, mileage } = req.body;
 
-  
   if (!vehicle || !serviceType) {
     return res.status(400).json({ error: 'vehicle and serviceType are required' });
   }
@@ -22,7 +22,7 @@ app.post('/logs', (req, res) => {
   res.status(201).json(newLog);
 });
 
-
+// US-003: Retrieve a Single Log
 app.get('/logs/:id', (req, res) => {
   const log = logStore.getLogById(req.params.id);
   
