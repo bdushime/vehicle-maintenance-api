@@ -1,8 +1,22 @@
 const express = require('express');
 const logStore = require('./logStore');
+const logger = require('./logger');
+
 
 const app = express();
 app.use(express.json());
+
+// Register the logger middleware first so it catches everything
+app.use(logger); 
+
+// US-005: Health Check Endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
+});
 
 // US-001: View All Logs
 app.get('/logs', (req, res) => {
