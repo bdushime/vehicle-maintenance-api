@@ -26,3 +26,42 @@ describe('Integration Tests: /logs endpoints', () => {
     });
   });
 });
+
+describe('POST /logs', () => {
+    test('should return 201 and the created log for a valid request', async () => {
+      const res = await request(app)
+        .post('/logs')
+        .send({ vehicle: '2014 Toyota RAV4', serviceType: 'Brake Pad Replacement' });
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body).toHaveProperty('id');
+      expect(res.body.vehicle).toBe('2014 Toyota RAV4');
+      expect(res.body.serviceType).toBe('Brake Pad Replacement');
+    });
+
+    test('should return 400 if vehicle or serviceType is missing', async () => {
+      const res = await request(app)
+        .post('/logs')
+        .send({ serviceType: 'Oil Change' }); // intentionally missing 'vehicle'
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toHaveProperty('error');
+    });
+  });
+
+  describe('GET /logs/:id', () => {
+    test('should return 200 and the log if the ID exists', async () => {
+      // Seed the database first
+      const createdLog = logStore.createLog('2014 Toyota RAV4', 'Tire Rotation');
+      
+      const res = await request(app).get(`/logs/${createdLog.id}`);
+      expect(res.statusCode).toBe(200);
+      expect(res.body.serviceType).toBe('Tire Rotation');
+    });
+
+    test('should return 404 if the ID does not exist', async () => {
+      const res = await request(app).get('/logs/999');
+      expect(res.statusCode).toBe(404);
+      expect(res.body).toHaveProperty('error');
+    });
+  });
