@@ -65,3 +65,23 @@ describe('POST /logs', () => {
       expect(res.body).toHaveProperty('error');
     });
   });
+
+  describe('DELETE /logs/:id', () => {
+    test('should return 204 and delete the log if ID exists', async () => {
+      
+      const createdLog = logStore.createLog('2014 Toyota RAV4', 'Tire Rotation');
+      
+      const res = await request(app).delete(`/logs/${createdLog.id}`);
+      expect(res.statusCode).toBe(204);
+      
+      const getRes = await request(app).get(`/logs/${createdLog.id}`);
+      expect(getRes.statusCode).toBe(404);
+    });
+
+    test('should return 404 if trying to delete a non-existent ID', async () => {
+      const res = await request(app).delete('/logs/999');
+      expect(res.statusCode).toBe(404);
+      expect(res.body).toHaveProperty('error');
+    });
+  });
+

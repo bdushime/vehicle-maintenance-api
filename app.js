@@ -47,4 +47,15 @@ app.get('/logs/:id', (req, res) => {
   res.status(200).json(log);
 });
 
+// US-004: Delete a Log
+app.delete('/logs/:id', (req, res) => {
+  const wasDeleted = logStore.deleteLog(req.params.id);
+  
+  if (!wasDeleted) {
+    return res.status(404).json({ error: 'Maintenance log not found' });
+  }
+  
+  res.status(204).send(); 
+});
+
 module.exports = app;
